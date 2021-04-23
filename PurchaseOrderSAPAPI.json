@@ -1,0 +1,177 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Microsoft.PurchaseOrder.SAPApi",
+    "version": "20200318.1"
+  },
+  "servers": [
+    {
+      "url": "https://procurementapis.azure-api.net"
+    }
+  ],
+  "paths": {
+    "/PurchaseOrderSAPAPIBprt/api/SAPActions/purchaseorder/get/{purchaseOrderNumber}": {
+      "get": {
+        "tags": [
+          "Purchase Order Details"
+        ],
+        "summary": "Get Purchase Order Details",
+        "operationId": "getPurchaseOrderSAPAPIBprtApiSAPActionsPurchaseorderGetByPurchaseOrderNumber",
+        "parameters": [
+          {
+            "name": "purchaseOrderNumber",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Purchase Order Details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.PurchaseOrder.SAPApi.Models.DataContract.PurchaseOrderDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Microsoft.PurchaseOrder.SAPApi.Models.DataContract.PurchaseOrderDetails": {
+        "type": "object",
+        "properties": {
+          "PurchaseOrderNumber": {
+            "type": "string"
+          },
+          "POStatus": {
+            "type": "string"
+          },
+          "CompanyCode": {
+            "type": "string"
+          },
+          "DocType": {
+            "type": "string"
+          },
+          "VendorNumber": {
+            "type": "string"
+          },
+          "VendorName": {
+            "type": "string"
+          },
+          "InvoiceApprover": {
+            "type": "string"
+          },
+          "POApprover": {
+            "type": "string"
+          },
+          "Title": {
+            "type": "string"
+          },
+          "Requestor": {
+            "type": "string"
+          },
+          "LineItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Microsoft.PurchaseOrder.SAPApi.Models.DataContract.PurchaseOrderLineItem"
+            }
+          }
+        }
+      },
+      "Microsoft.PurchaseOrder.SAPApi.Models.DataContract.PurchaseOrderLineItem": {
+        "type": "object",
+        "properties": {
+          "LineItemNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "CurrencyCode": {
+            "type": "string"
+          },
+          "Quantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "OpenQuantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "InvoiceQuantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "ReceivedQuantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "DeliveryDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "UnitPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "InvoiceAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "OpenAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "AccountAssignmentCategory": {
+            "type": "string"
+          },
+          "AccountCode": {
+            "type": "string"
+          },
+          "CostCenter": {
+            "type": "string"
+          },
+          "DeleteIndicator": {
+            "type": "string"
+          },
+          "OrderAckNumber": {
+            "type": "string"
+          },
+          "Asset": {
+            "type": "string"
+          },
+          "AssetSubNumber": {
+            "type": "string"
+          },
+          "AssetSerialNumber": {
+            "type": "string"
+          },
+          "AssetTag": {
+            "type": "string"
+          },
+          "AssetClassCode": {
+            "type": "string"
+          },
+          "GoodsRecieptFlag": {
+            "type": "boolean"
+          },
+          "PurchaseClassificationCode": {
+            "type": "string"
+          },
+          "InternalOrderNumber": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
