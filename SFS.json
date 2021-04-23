@@ -1,0 +1,833 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Content Delivery Platform - SFS",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{accountId}.api.cdp.microsoft.com/api/v1",
+      "description": "Production endpoint (PROD).",
+      "variables": {
+        "accountId": {
+          "default": "example",
+          "description": "Identity of content publisher. Alphanumeric only, 3-24 chars in length."
+        }
+      }
+    },
+    {
+      "url": "https://{accountId}.api.cdp.microsoft.com/api/v1.1",
+      "description": "Production endpoint (PROD) for DownloadInfo.",
+      "variables": {
+        "accountId": {
+          "default": "example",
+          "description": "Identity of content publisher. Alphanumeric only, 3-24 chars in length."
+        }
+      }
+    },
+    {
+      "url": "https://{accountId}.api-{environment}.dcat.dsp.mp.microsoft.com/api/v1",
+      "description": "Pre-production endpoint.",
+      "variables": {
+        "accountId": {
+          "default": "none",
+          "description": "Identity of content publisher. Alphanumeric only, 3-24 chars in length."
+        },
+        "environment": {
+          "default": "int",
+          "enum": [
+            "int",
+            "dev"
+          ]
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/contents/{instanceId}/namespaces/{namespace}/names/{name}/versions/{version}": {
+      "get": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Get a specific version of content.",
+        "operationId": "getVersion",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/instanceId"
+          },
+          {
+            "$ref": "#/components/parameters/namespace"
+          },
+          {
+            "$ref": "#/components/parameters/name"
+          },
+          {
+            "$ref": "#/components/parameters/version"
+          },
+          {
+            "$ref": "#/components/parameters/User-Agent"
+          },
+          {
+            "$ref": "#/components/parameters/cV"
+          },
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Content"
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServerBusy"
+          }
+        }
+      }
+    },
+    "/contents/{instanceId}/namespaces/{namespace}/names/{name}/versions/{version}/files": {
+      "get": {
+        "tags": [
+          "file"
+        ],
+        "summary": "Get all file metadata from a content version.",
+        "operationId": "getAllFiles",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "MS-CV": {
+                "$ref": "#/components/headers/MS-CV"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/file"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServerBusy"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "download"
+        ],
+        "summary": "Get all download information from all files in a content version.",
+        "operationId": "generateAllDownloadInfos",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/fileAction"
+          },
+          {
+            "$ref": "#/components/parameters/Forwarded"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "MS-CV": {
+                "$ref": "#/components/headers/MS-CV"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/fileDownloadInfo"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServerBusy"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/instanceId"
+        },
+        {
+          "$ref": "#/components/parameters/namespace"
+        },
+        {
+          "$ref": "#/components/parameters/name"
+        },
+        {
+          "$ref": "#/components/parameters/version"
+        },
+        {
+          "$ref": "#/components/parameters/User-Agent"
+        },
+        {
+          "$ref": "#/components/parameters/cV"
+        }
+      ]
+    },
+    "/internal/contents/{instanceId}/namespaces/{namespace}/names/{name}/versions/{version}/files": {
+      "post": {
+        "tags": [
+          "download"
+        ],
+        "summary": "Get all download information from all files in a content version with dns based traffic shaping to determine foreground vs background calls.",
+        "operationId": "generateAllDownloadInfos",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/fileAction"
+          },
+          {
+            "$ref": "#/components/parameters/Forwarded"
+          },
+          {
+            "$ref": "#/components/parameters/foregroundpriority"
+          },
+          {
+            "$ref": "#/components/parameters/tlsdownload"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "MS-CV": {
+                "$ref": "#/components/headers/MS-CV"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/fileDownloadInfo"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServerBusy"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/instanceId"
+        },
+        {
+          "$ref": "#/components/parameters/namespace"
+        },
+        {
+          "$ref": "#/components/parameters/name"
+        },
+        {
+          "$ref": "#/components/parameters/version"
+        },
+        {
+          "$ref": "#/components/parameters/User-Agent"
+        },
+        {
+          "$ref": "#/components/parameters/cV"
+        }
+      ]
+    },
+    "/contents/{instanceId}/namespaces/{namespace}/names/{name}/versions/latest": {
+      "post": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Request service to select the highest content version  that client is authorized and targeted for.",
+        "operationId": "selectLatestVersion",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "query",
+            "description": "Action to perform.",
+            "required": true,
+            "schema": {
+              "enum": [
+                "select"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "targetingAttributes"
+                ],
+                "type": "object",
+                "properties": {
+                  "targetingAttributes": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "List of attributes in key value pair format that publisher can use for targeting. Pass empty list if there isn't any attribute usable for targeting."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Content"
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServerBusy"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/instanceId"
+        },
+        {
+          "$ref": "#/components/parameters/namespace"
+        },
+        {
+          "$ref": "#/components/parameters/name"
+        },
+        {
+          "$ref": "#/components/parameters/User-Agent"
+        },
+        {
+          "$ref": "#/components/parameters/cV"
+        },
+        {
+          "$ref": "#/components/parameters/If-None-Match"
+        },
+        {
+          "$ref": "#/components/parameters/Forwarded"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "contentId": {
+        "required": [
+          "namespace",
+          "name",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9.-]+$",
+            "type": "string",
+            "description": "Content namespace. Value must be 'default'.",
+            "example": "default"
+          },
+          "name": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9.-]+$",
+            "type": "string",
+            "description": "Content name.",
+            "example": "Windows.OS.x86"
+          },
+          "version": {
+            "maxLength": 23,
+            "minLength": 7,
+            "type": "string",
+            "description": "4-part integer version. Each part can range from 0-65535.",
+            "example": "1.0.0.0"
+          }
+        },
+        "description": "Unique content identifier."
+      },
+      "content": {
+        "required": [
+          "contentId"
+        ],
+        "type": "object",
+        "properties": {
+          "contentId": {
+            "$ref": "#/components/schemas/contentId"
+          }
+        },
+        "description": "Content entity."
+      },
+      "fileId": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[a-zA-Z0-9.-]+$",
+        "type": "string",
+        "description": "Unique file identifier within a content version",
+        "example": "UpdateMetadata"
+      },
+      "file": {
+        "required": [
+          "fileId",
+          "sizeInBytes",
+          "hashes"
+        ],
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "$ref": "#/components/schemas/fileId"
+          },
+          "sizeInBytes": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "File size in number of bytes.",
+            "format": "int64",
+            "example": 1024
+          },
+          "hashes": {
+            "$ref": "#/components/schemas/fileHashes"
+          },
+          "timeLimitedUrl": {
+            "type": "boolean",
+            "description": "Whether file download URL has an expiration time."
+          },
+          "deliveryOptimization": {
+            "$ref": "#/components/schemas/deliveryOptimization"
+          }
+        },
+        "description": "File entity."
+      },
+      "fileDownloadInfo": {
+        "required": [
+          "fileId",
+          "url",
+          "sizeInBytes",
+          "hashes"
+        ],
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "$ref": "#/components/schemas/fileId"
+          },
+          "url": {
+            "type": "string",
+            "description": "Download URL.",
+            "format": "uri",
+            "example": "http://account.id.f|b.tlu.dl.delivery.mp.microsoft.com/files/41D2F680-5988-4831-97C5-99C4C3665D75?P1=TLUData"
+          },
+          "sizeInBytes": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "File size in number of bytes.",
+            "format": "int64",
+            "example": 1024
+          },
+          "hashes": {
+            "$ref": "#/components/schemas/fileHashes"
+          },
+          "deliveryOptimization": {
+            "$ref": "#/components/schemas/deliveryOptimization"
+          }
+        },
+        "description": "GenerateDownloadInfo API response schema."
+      },
+      "fileHashes": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "Dictionary of algorithm name (e.g. SHA256) to base64 encoded file hash string. Client should parse this as dictionary as service reserves the right to send additional algorithm without changing API version.",
+        "example": {
+          "sha256": "w2cy42AR2pOR6uqQ7367IdIj+AnaCArEsSlNHjosQJY="
+        }
+      },
+      "deliveryOptimization": {
+        "required": [
+          "catalogId"
+        ],
+        "type": "object",
+        "properties": {
+          "catalogId": {
+            "type": "string",
+            "description": "File identifier for DO client.",
+            "example": "fZJqQbfPw6nNuwhWVeiJ4l8dk4%2FiKzfiyR0bG6lxIa8%3D"
+          },
+          "properties": {
+            "type": "object",
+            "description": "Optional property bag of opaque key value pairs to be passed to DO client if present. Client should parse this as dictionary as service reserves the right to add/remove key value pairs without changing API version.",
+            "example": {
+              "IntegrityCheckInfo": {
+                "PiecesHashFileUrl": "http://dl.cdp.microsoft.com/pieceshash.cab",
+                "HashOfHashes": "fZJqQbfPw6nNuwhWVeiJ4l8dk4/iKzfiyR0bG6lxIa8="
+              }
+            }
+          }
+        },
+        "description": "Supplemental metadata for downloading using DeliveryOptimization (DO) client. Optional, may not always be present."
+      },
+      "error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Error code. Optional, may not always be present.",
+            "format": "int32",
+            "example": 4001
+          },
+          "description": {
+            "type": "string",
+            "description": "Error code description. Optional, may not always be present.",
+            "example": "Required parameter is missing."
+          },
+          "message": {
+            "type": "string",
+            "description": "Detailed error message. Optional, may not always be present.",
+            "example": "Thou shall not omit a required parameter."
+          },
+          "parameter": {
+            "type": "string",
+            "description": "Name of the erroneous parameter if any. Optional, may not always be present.",
+            "example": "targetingAttributes"
+          }
+        },
+        "description": "Error detail."
+      }
+    },
+    "responses": {
+      "Content": {
+        "description": "HTTP 200 - OK",
+        "headers": {
+          "MS-CV": {
+            "$ref": "#/components/headers/MS-CV"
+          },
+          "ETag": {
+            "$ref": "#/components/headers/ETag"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/content"
+            }
+          }
+        }
+      },
+      "NotModified": {
+        "description": "HTTP 304 - Not Modified.",
+        "headers": {
+          "MS-CV": {
+            "$ref": "#/components/headers/MS-CV"
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "HTTP 400 - One of the parameters is missing or not in expected format.",
+        "headers": {
+          "MS-CV": {
+            "$ref": "#/components/headers/MS-CV"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "HTTP 404 - Requested resource cannot be found.",
+        "headers": {
+          "MS-CV": {
+            "$ref": "#/components/headers/MS-CV"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "HTTP 429 - Too Many Requests.",
+        "headers": {
+          "MS-CV": {
+            "$ref": "#/components/headers/MS-CV"
+          },
+          "Retry-After": {
+            "description": "Number of seconds to wait before retrying request.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "HTTP 500 - Internal server error.",
+        "headers": {
+          "MS-CV": {
+            "$ref": "#/components/headers/MS-CV"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "ServerBusy": {
+        "description": "HTTP 503 - Server busy or unavailable.",
+        "headers": {
+          "MS-CV": {
+            "$ref": "#/components/headers/MS-CV"
+          },
+          "Retry-After": {
+            "description": "Number of seconds to wait before retrying request.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "instanceId": {
+        "name": "instanceId",
+        "in": "path",
+        "description": "Identity of the service instance created by publisher. Alphanumeric and hyphen, 3-36 chars in length. Can't start with hypen.",
+        "required": true,
+        "schema": {
+          "maxLength": 36,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{2,35}$",
+          "type": "string"
+        }
+      },
+      "namespace": {
+        "name": "namespace",
+        "in": "path",
+        "description": "First level, version independent, content identifier. Value must be 'default'.",
+        "required": true,
+        "schema": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9.-]+$",
+          "type": "string"
+        }
+      },
+      "name": {
+        "name": "name",
+        "in": "path",
+        "description": "Second level, version independent, content identifier.",
+        "required": true,
+        "schema": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9.-]+$",
+          "type": "string"
+        }
+      },
+      "version": {
+        "name": "version",
+        "in": "path",
+        "description": "4-part integer version. Each part can range from 0-65535.",
+        "required": true,
+        "schema": {
+          "maxLength": 23,
+          "minLength": 7,
+          "type": "string",
+          "example": "1.0.0.0"
+        }
+      },
+      "fileId": {
+        "name": "fileId",
+        "in": "path",
+        "description": "Unique file identifier within a content version.",
+        "required": true,
+        "schema": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9.-]+$",
+          "type": "string"
+        }
+      },
+      "User-Agent": {
+        "name": "User-Agent",
+        "in": "header",
+        "description": "Caller application ID.",
+        "schema": {
+          "maxLength": 128,
+          "type": "string"
+        }
+      },
+      "cV": {
+        "name": "MS-CV",
+        "in": "header",
+        "description": "Correlation Vector string for telemetry stitching.",
+        "schema": {
+          "maxLength": 128,
+          "type": "string"
+        }
+      },
+      "If-None-Match": {
+        "name": "If-None-Match",
+        "in": "header",
+        "description": "ETag for conditional request.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Forwarded": {
+        "name": "Forwarded",
+        "in": "header",
+        "description": "Allows caller to forward its client information like IP address. Based on RFC 7239, section 4: Forwarded",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "fileAction": {
+        "name": "action",
+        "in": "query",
+        "description": "POST action on file(s).",
+        "required": true,
+        "schema": {
+          "enum": [
+            "generateDownloadInfo"
+          ],
+          "type": "string"
+        }
+      },
+      "foregroundpriority": {
+        "name": "foregroundpriority",
+        "in": "query",
+        "description": "Defines call type - background vs foreground.",
+        "required": true,
+        "schema": {
+          "enum": [
+            true,
+            false
+          ],
+          "type": "boolean"
+        }
+      },
+      "tlsdownload": {
+        "name": "tlsdownload",
+        "in": "query",
+        "description": "Defines secure vs non-secure download(http vs https).",
+        "required": true,
+        "schema": {
+          "enum": [
+            true,
+            false
+          ],
+          "type": "boolean"
+        }
+      }
+    },
+    "headers": {
+      "MS-CV": {
+        "description": "Correlation vector for telemetry stiching.",
+        "schema": {
+          "maxLength": 128,
+          "type": "string"
+        }
+      },
+      "ETag": {
+        "description": "Opaque identifier assigned to this specific resource.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "content"
+    },
+    {
+      "name": "file"
+    },
+    {
+      "name": "download"
+    }
+  ]
+}
